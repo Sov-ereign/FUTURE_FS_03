@@ -24,14 +24,36 @@ const languageRows = [
 
 export default function BrowseByLanguagesPage() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredRows = languageRows
+    .map(row => ({
+      ...row,
+      items: row.items.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    }))
+    .filter(row => row.items.length > 0 || searchQuery === "");
+
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      <Navigation categories={categories} searchOpen={searchOpen} setSearchOpen={setSearchOpen} />
+      <Navigation
+        categories={categories}
+        searchOpen={searchOpen}
+        setSearchOpen={setSearchOpen}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
       <main className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <h2 className="text-2xl font-bold text-white mb-4">Browse by Languages</h2>
-        {languageRows.map((row, idx) => (
-          <ContentRow key={idx} title={row.title} items={row.items} />
-        ))}
+        {filteredRows.length > 0 ? (
+          filteredRows.map((row, idx) => (
+            <ContentRow key={idx} title={row.title} items={row.items} />
+          ))
+        ) : (
+          <div className="text-center text-gray-400 py-12 text-lg">No results found.</div>
+        )}
       </main>
     </div>
   );

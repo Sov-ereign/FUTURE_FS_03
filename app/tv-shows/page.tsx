@@ -13,6 +13,12 @@ const tvShows = [
 
 export default function TVShowsPage() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredShows = tvShows.filter(show =>
+    show.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (show.description && show.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -20,9 +26,15 @@ export default function TVShowsPage() {
         categories={categories}
         searchOpen={searchOpen}
         setSearchOpen={setSearchOpen}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
       />
       <main className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ContentRow title="TV Shows" items={tvShows} />
+        {filteredShows.length > 0 ? (
+          <ContentRow title="TV Shows" items={filteredShows} />
+        ) : (
+          <div className="text-center text-gray-400 py-12 text-lg">No results found.</div>
+        )}
       </main>
     </div>
   );

@@ -48,12 +48,24 @@ const categories: CategoryName[] = ["Home", "TV Shows", "Movies", "New & Popular
 
 export default function NetflixRedesign() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [showHeroInfo, setShowHeroInfo] = useState(false);
   const router = useRouter();
 
   const handleHeroPlay = () => {
     router.push(`/play?title=${encodeURIComponent(heroContent.title)}&video=${encodeURIComponent('/assests/ROOM_5.exe - CORTAR FF (1080p, h264).mp4')}`);
   };
+
+  // Filter contentRows based on searchQuery
+  const filteredRows = contentRows
+    .map(row => ({
+      ...row,
+      items: row.items.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    }))
+    .filter(row => row.items.length > 0 || searchQuery === "");
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -62,6 +74,8 @@ export default function NetflixRedesign() {
         categories={categories}
         searchOpen={searchOpen}
         setSearchOpen={setSearchOpen}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
       />
       {/* Hero Section */}
       <main>
@@ -137,9 +151,12 @@ export default function NetflixRedesign() {
         {/* Content Rows */}
         <section className="relative z-10 -mt-32 pb-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-            {contentRows.map((row, rowIndex) => (
+            {filteredRows.map((row, rowIndex) => (
               <ContentRow key={rowIndex} title={row.title} items={row.items} />
             ))}
+            {searchQuery && filteredRows.length === 0 && (
+              <div className="text-center text-gray-400 py-12 text-lg">No results found.</div>
+            )}
           </div>
         </section>
       </main>

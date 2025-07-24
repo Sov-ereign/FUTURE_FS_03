@@ -15,11 +15,28 @@ const movies = [
 
 export default function MoviesPage() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredMovies = movies.filter(movie =>
+    movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (movie.description && movie.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      <Navigation categories={categories} searchOpen={searchOpen} setSearchOpen={setSearchOpen} />
+      <Navigation
+        categories={categories}
+        searchOpen={searchOpen}
+        setSearchOpen={setSearchOpen}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
       <main className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ContentRow title="Movies" items={movies} />
+        {filteredMovies.length > 0 ? (
+          <ContentRow title="Movies" items={filteredMovies} />
+        ) : (
+          <div className="text-center text-gray-400 py-12 text-lg">No results found.</div>
+        )}
       </main>
     </div>
   );

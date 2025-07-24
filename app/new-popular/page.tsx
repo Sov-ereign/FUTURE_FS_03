@@ -15,11 +15,28 @@ const newPopular = [
 
 export default function NewPopularPage() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredPopular = newPopular.filter(item =>
+    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      <Navigation categories={categories} searchOpen={searchOpen} setSearchOpen={setSearchOpen} />
+      <Navigation
+        categories={categories}
+        searchOpen={searchOpen}
+        setSearchOpen={setSearchOpen}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
       <main className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ContentRow title="New & Popular" items={newPopular} />
+        {filteredPopular.length > 0 ? (
+          <ContentRow title="New & Popular" items={filteredPopular} />
+        ) : (
+          <div className="text-center text-gray-400 py-12 text-lg">No results found.</div>
+        )}
       </main>
     </div>
   );

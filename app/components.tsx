@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Bell, ChevronDown, Star, Plus, Play, Info } from 'lucide-react';
+import { Search, ChevronDown, Star, Plus, Play, Info, Check } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMyList } from '../my-list-context';
@@ -30,6 +30,8 @@ interface NavigationProps {
   categories: CategoryName[];
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
+  searchQuery: string;
+  setSearchQuery: (q: string) => void;
 }
 
 interface ContentRowProps {
@@ -45,7 +47,7 @@ interface ContentItem {
   description?: string;
 }
 
-export function Navigation({ categories, searchOpen, setSearchOpen }: NavigationProps) {
+export function Navigation({ categories, searchOpen, setSearchOpen, searchQuery, setSearchQuery }: NavigationProps) {
   const pathname = usePathname();
   return (
     <header>
@@ -85,9 +87,6 @@ export function Navigation({ categories, searchOpen, setSearchOpen }: Navigation
               >
                 <Search className="h-5 w-5" />
               </button>
-              <button className="p-2 rounded-full hover:bg-white/10 transition-colors duration-200">
-                <Bell className="h-5 w-5" />
-              </button>
               <button className="flex items-center space-x-2 p-2 rounded-full hover:bg-white/10 transition-colors duration-200">
                 <div className="w-8 h-8 bg-gradient-to-br from-[#8b5cf6] to-[#00d4ff] rounded-full flex items-center justify-center">
                   <span className="text-xs font-medium">JD</span>
@@ -106,6 +105,8 @@ export function Navigation({ categories, searchOpen, setSearchOpen }: Navigation
                 placeholder="Search for movies, TV shows, documentaries and more..."
                 className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00d4ff] focus:border-transparent"
                 autoFocus
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
@@ -170,9 +171,14 @@ export function ContentCard({ item }: { item: ContentItem }) {
                 className={`p-2 rounded-full transition-colors duration-200 ${inList ? 'bg-[#00d4ff]/80' : 'bg-white/20'} backdrop-blur-sm hover:bg-white/30`}
                 onClick={handlePlus}
                 title={inList ? 'Remove from My List' : 'Add to My List'}
+                aria-label={inList ? 'Remove from My List' : 'Add to My List'}
                 type="button"
               >
-                <Plus className={`h-4 w-4 ${inList ? 'text-white fill-current' : 'text-white'}`} fill={inList ? 'currentColor' : 'none'} />
+                {inList ? (
+                  <Check className="h-4 w-4 text-white" />
+                ) : (
+                  <Plus className="h-4 w-4 text-white" />
+                )}
               </button>
             </div>
             <div>
