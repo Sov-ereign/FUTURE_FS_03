@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ChevronDown, Star, Plus, Play, Info, Check } from 'lucide-react';
+import { Search, ChevronDown, Star, Plus, Play, Info, Check, User as UserIcon, Menu as MenuIcon, X as CloseIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMyList } from '../my-list-context';
+import { useEffect } from 'react';
+import { auth } from '../firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 
 const categoryRoutes = {
   'Home': '/',
@@ -49,14 +53,31 @@ interface ContentItem {
 
 export function Navigation({ categories, searchOpen, setSearchOpen, searchQuery, setSearchQuery }: NavigationProps) {
   const pathname = usePathname();
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setProfileMenuOpen(false);
+    router.push('/');
+  };
   return (
     <header>
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-black/95 backdrop-blur-md`} aria-label="Main Navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <div className="flex items-center space-x-8">
-              <div style={{ width: 84, height: 84, position: 'relative' }}>
+            <div className="flex items-center space-x-8 relative w-full">
+              <div style={{ width: 84, height: 84, position: 'relative' }} className="ml-12 md:ml-0">
                 <Image
                   src="/assests/N--logo.png"
                   alt="Netflix AI Logo"
@@ -78,21 +99,76 @@ export function Navigation({ categories, searchOpen, setSearchOpen, searchQuery,
                   </Link>
                 ))}
               </div>
+              {/* Hamburger for mobile - absolute left */}
+              <button
+                className="md:hidden p-2 rounded hover:bg-white/10 transition-colors absolute left-0 top-1/2 -translate-y-1/2 z-20"
+                style={{ marginLeft: 8 }}
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open menu"
+              >
+                <MenuIcon className="h-7 w-7 text-white" />
+              </button>
             </div>
             {/* Right Navigation */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 relative">
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
                 className="p-2 rounded-full hover:bg-white/10 transition-colors duration-200"
               >
                 <Search className="h-5 w-5" />
               </button>
-              <button className="flex items-center space-x-2 p-2 rounded-full hover:bg-white/10 transition-colors duration-200">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#8b5cf6] to-[#00d4ff] rounded-full flex items-center justify-center">
-                  <span className="text-xs font-medium">JD</span>
-                </div>
-                <ChevronDown className="h-4 w-4" />
-              </button>
+              {/* Profile Dropdown */}
+              <div className="relative">
+                <button
+                  className="flex items-center space-x-2 p-2 rounded-full hover:bg-white/10 transition-colors duration-200"
+                  onClick={() => setProfileMenuOpen((open) => !open)}
+                  aria-label="Account menu"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#8b5cf6] to-[#00d4ff] rounded-full flex items-center justify-center">
+                    <UserIcon className="h-5 w-5 text-white" />
+                  </div>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+                {profileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-gray-900 border border-gray-800 rounded shadow-lg z-50">
+                    {user ? (
+                      <>
+                        <div className="block px-4 py-2 text-sm text-white border-b border-gray-800">{user.email || 'Profile'}</div>
+                        <button
+                          onClick={handleLogout}
+                          className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
+                        >
+                          Logout
+                        </button>
+                        <Link
+                          href="/my-list"
+                          className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
+                          onClick={() => setProfileMenuOpen(false)}
+                        >
+                          My List
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          href="/login"
+                          className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
+                          onClick={() => setProfileMenuOpen(false)}
+                        >
+                          Login/Register
+                        </Link>
+                        <Link
+                          href="/my-list"
+                          className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
+                          onClick={() => setProfileMenuOpen(false)}
+                        >
+                          My List
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -112,6 +188,78 @@ export function Navigation({ categories, searchOpen, setSearchOpen, searchQuery,
           </div>
         )}
       </nav>
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-black/95 flex flex-col">
+          <div className="flex items-center justify-between px-4 py-4 border-b border-gray-800">
+            <div style={{ width: 60, height: 60, position: 'relative' }}>
+              <Image
+                src="/assests/N--logo.png"
+                alt="Netflix AI Logo"
+                fill
+                style={{ objectFit: 'contain' }}
+                className="rounded"
+                priority
+              />
+            </div>
+            <button
+              className="p-2 rounded hover:bg-white/10 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close menu"
+            >
+              <CloseIcon className="h-7 w-7 text-white" />
+            </button>
+          </div>
+          <div className="flex flex-col space-y-4 px-6 py-8">
+            {categories.map((category) => (
+              <Link
+                key={category}
+                href={categoryRoutes[category]}
+                className={`text-lg font-semibold transition-colors duration-200 hover:text-[#00d4ff] ${pathname === categoryRoutes[category] ? 'text-white' : 'text-gray-300'}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {category}
+              </Link>
+            ))}
+            <div className="border-t border-gray-800 my-4" />
+            {user ? (
+              <>
+                <div className="text-white text-base mb-2">{user.email || 'Profile'}</div>
+                <button
+                  onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                  className="w-full text-left px-4 py-2 text-base text-white hover:bg-gray-800 transition-colors rounded"
+                >
+                  Logout
+                </button>
+                <Link
+                  href="/my-list"
+                  className="block px-4 py-2 text-base text-white hover:bg-gray-800 transition-colors rounded"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  My List
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="block px-4 py-2 text-base text-white hover:bg-gray-800 transition-colors rounded"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Login/Register
+                </Link>
+                <Link
+                  href="/my-list"
+                  className="block px-4 py-2 text-base text-white hover:bg-gray-800 transition-colors rounded"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  My List
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
