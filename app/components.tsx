@@ -1,8 +1,52 @@
 import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Search, Bell, ChevronDown, Star, Plus, Play, Info } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useMyList } from '../my-list-context';
 
-export function Navigation({ categories, activeCategory, setActiveCategory, searchOpen, setSearchOpen }) {
+const categoryRoutes = {
+  'Home': '/',
+  'TV Shows': '/tv-shows',
+  'Movies': '/movies',
+  'New & Popular': '/new-popular',
+  'My List': '/my-list',
+  'Browse by Languages': '/browse-by-languages',
+};
+
+// Add types for navigation categories
+const categoryNames = [
+  'Home',
+  'TV Shows',
+  'Movies',
+  'New & Popular',
+  'My List',
+  'Browse by Languages',
+] as const;
+export type CategoryName = typeof categoryNames[number];
+
+interface NavigationProps {
+  categories: CategoryName[];
+  searchOpen: boolean;
+  setSearchOpen: (open: boolean) => void;
+}
+
+interface ContentRowProps {
+  title: string;
+  items: ContentItem[];
+}
+
+interface ContentItem {
+  id: number;
+  title: string;
+  image: string;
+  rating: number;
+  description?: string;
+}
+
+export function Navigation({ categories, searchOpen, setSearchOpen }: NavigationProps) {
+  const pathname = usePathname();
   return (
     <header>
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-black/95 backdrop-blur-md`} aria-label="Main Navigation">
@@ -23,13 +67,13 @@ export function Navigation({ categories, activeCategory, setActiveCategory, sear
               {/* Desktop Navigation */}
               <div className="hidden md:flex space-x-6">
                 {categories.map((category) => (
-                  <button
+                  <Link
                     key={category}
-                    onClick={() => setActiveCategory(category)}
-                    className={`text-sm font-medium transition-colors duration-200 hover:text-[#00d4ff] ${activeCategory === category ? 'text-white' : 'text-gray-300'}`}
+                    href={categoryRoutes[category]}
+                    className={`text-sm font-medium transition-colors duration-200 hover:text-[#00d4ff] ${pathname === categoryRoutes[category] ? 'text-white' : 'text-gray-300'}`}
                   >
                     {category}
-                  </button>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -71,7 +115,7 @@ export function Navigation({ categories, activeCategory, setActiveCategory, sear
   );
 }
 
-export function ContentRow({ title, items }) {
+export function ContentRow({ title, items }: ContentRowProps) {
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold text-white">{title}</h2>
@@ -84,8 +128,23 @@ export function ContentRow({ title, items }) {
   );
 }
 
-export function ContentCard({ item }) {
+export function ContentCard({ item }: { item: ContentItem }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const router = useRouter();
+  const { addToList, removeFromList, isInList } = useMyList();
+  const inList = isInList(item.id);
+  const handlePlay = () => {
+    router.push(`/play?title=${encodeURIComponent(item.title)}&video=${encodeURIComponent('/assests/ROOM_5.exe - CORTAR FF (1080p, h264).mp4')}`);
+  };
+  const handlePlus = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (inList) {
+      removeFromList(item.id);
+    } else {
+      addToList(item);
+    }
+  };
   return (
     <div
       className="group relative flex-shrink-0 w-40 h-60 cursor-pointer transition-all duration-300 transform hover:scale-110 hover:z-20"
@@ -107,21 +166,49 @@ export function ContentCard({ item }) {
                 <Star className="h-4 w-4 text-yellow-400 fill-current" />
                 <span className="text-sm text-white">{item.rating}</span>
               </div>
-              <button className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors duration-200">
-                <Plus className="h-4 w-4 text-white" />
+              <button
+                className={`p-2 rounded-full transition-colors duration-200 ${inList ? 'bg-[#00d4ff]/80' : 'bg-white/20'} backdrop-blur-sm hover:bg-white/30`}
+                onClick={handlePlus}
+                title={inList ? 'Remove from My List' : 'Add to My List'}
+                type="button"
+              >
+                <Plus className={`h-4 w-4 ${inList ? 'text-white fill-current' : 'text-white'}`} fill={inList ? 'currentColor' : 'none'} />
               </button>
             </div>
             <div>
               <h3 className="text-white font-semibold text-lg mb-2">{item.title}</h3>
               <div className="flex space-x-2">
-                <button className="p-2 rounded-full bg-white text-black hover:bg-gray-200 transition-colors duration-200">
+                <button
+                  className="p-2 rounded-full bg-white text-black hover:bg-gray-200 transition-colors duration-200"
+                  onClick={handlePlay}
+                  type="button"
+                >
                   <Play className="h-4 w-4 fill-current" />
                 </button>
-                <button className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors duration-200">
+                <button
+                  className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors duration-200"
+                  onClick={() => setShowInfo(true)}
+                  type="button"
+                >
                   <Info className="h-4 w-4 text-white" />
                 </button>
               </div>
             </div>
+          </div>
+        )}
+        {/* Info Popup */}
+        {showInfo && (
+          <div className="absolute inset-0 flex flex-col justify-center items-center bg-black/90 bg-opacity-90 p-4 z-30 rounded-lg">
+            <div className="text-white text-xs mb-2 text-center">
+              {item.description || "No description available."}
+            </div>
+            <button
+              className="mt-2 px-2 py-1 text-xs bg-white/20 text-white rounded hover:bg-white/30"
+              onClick={() => setShowInfo(false)}
+              type="button"
+            >
+              Close
+            </button>
           </div>
         )}
       </div>

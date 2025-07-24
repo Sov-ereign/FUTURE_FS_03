@@ -2,6 +2,8 @@ import * as React from 'react';
 import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu';
 import { cva } from 'class-variance-authority';
 import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { cn } from '@/lib/utils';
 
@@ -114,6 +116,41 @@ const NavigationMenuIndicator = React.forwardRef<
 ));
 NavigationMenuIndicator.displayName =
   NavigationMenuPrimitive.Indicator.displayName;
+
+// --- Custom Navigation Links for App Pages ---
+export function AppNavigationMenu() {
+  const pathname = usePathname();
+  const links = [
+    { label: 'Home', href: '/' },
+    { label: 'TV Shows', href: '/tv-shows' },
+    { label: 'Movies', href: '/movies' },
+    { label: 'New & Popular', href: '/new-popular' },
+    { label: 'My List', href: '/my-list' },
+    { label: 'Browse by Languages', href: '/browse-by-languages' },
+  ];
+  return (
+    <NavigationMenu>
+      <NavigationMenuList>
+        {links.map(link => (
+          <NavigationMenuItem key={link.href}>
+            <Link href={link.href} legacyBehavior passHref>
+              <NavigationMenuLink
+                active={pathname === link.href}
+                className={
+                  pathname === link.href
+                    ? 'text-white bg-accent'
+                    : 'text-gray-300'
+                }
+              >
+                {link.label}
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        ))}
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
 
 export {
   navigationMenuTriggerStyle,

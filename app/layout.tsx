@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { MyListProvider } from '../my-list-context';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -56,7 +57,11 @@ export default function RootLayout({
         <meta name="robots" content="index, follow" />
       </head>
       <body className={`${inter.className} font-sans antialiased`}>
-        {children}
+        <MyListProvider>
+          <main>
+            {children}
+          </main>
+        </MyListProvider>
       </body>
     </html>
   );
