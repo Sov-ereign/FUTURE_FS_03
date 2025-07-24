@@ -3,8 +3,16 @@ import { useState } from "react";
 import { Navigation } from "../components";
 import { useMyList } from '../../my-list-context';
 import { ContentRow } from '../components';
+import type { CategoryName } from "../components";
 
-const categories = ["Home", "TV Shows", "Movies", "New & Popular", "My List", "Browse by Languages"];
+const categories: CategoryName[] = [
+  "Home",
+  "TV Shows",
+  "Movies",
+  "New & Popular",
+  "My List",
+  "Browse by Languages"
+];
 
 export default function MyListPage() {
   const [searchOpen, setSearchOpen] = useState(false);
