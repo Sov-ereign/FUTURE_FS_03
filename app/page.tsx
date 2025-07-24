@@ -10,41 +10,33 @@ const heroContent = {
   description: "When a young boy disappears, his mother, a police chief and his friends must confront terrifying supernatural forces in order to get him back.",
   rating: "4.8",
   year: "2024",
-  genre: "Sci-Fi • Drama • Horror"
+  genre: "Sci-Fi • Drama • Horror",
+  image: "/assests/Stranger.jpg"
 };
 
 const contentRows = [
   {
     title: "Trending Now",
     items: [
-      { id: 1, title: "The Crown", image: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.9 },
-      { id: 2, title: "Bridgerton", image: "https://images.pexels.com/photos/7234252/pexels-photo-7234252.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.7 },
-      { id: 3, title: "Money Heist", image: "https://images.pexels.com/photos/8111681/pexels-photo-8111681.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.8 },
-      { id: 4, title: "Ozark", image: "https://images.pexels.com/photos/6899505/pexels-photo-6899505.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.6 },
-      { id: 5, title: "The Witcher", image: "https://images.pexels.com/photos/8111688/pexels-photo-8111688.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.5 },
-      { id: 6, title: "Dark", image: "https://images.pexels.com/photos/7991612/pexels-photo-7991612.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.9 }
+      { id: 17, title: "The Gray Man", image: "/assests/The Gray Man.jpg", rating: 4.0 },
+      { id: 4, title: "Ozark", image: "/assests/Ozark.jpg", rating: 4.6 },
+      { id: 5, title: "The Witcher", image: "/assests/The Witcher.jpg", rating: 4.5 },
+      { id: 6, title: "Stranger Things", image: "/assests/Stranger.jpg", rating: 4.8 }
     ]
   },
   {
     title: "Netflix Originals",
     items: [
-      { id: 7, title: "House of Cards", image: "https://images.pexels.com/photos/8111687/pexels-photo-8111687.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.4 },
-      { id: 8, title: "Orange is the New Black", image: "https://images.pexels.com/photos/7234254/pexels-photo-7234254.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.3 },
-      { id: 9, title: "Narcos", image: "https://images.pexels.com/photos/6899499/pexels-photo-6899499.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.7 },
-      { id: 10, title: "The Umbrella Academy", image: "https://images.pexels.com/photos/7991625/pexels-photo-7991625.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.6 },
-      { id: 11, title: "Mindhunter", image: "https://images.pexels.com/photos/8111682/pexels-photo-8111682.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.8 },
-      { id: 12, title: "Black Mirror", image: "https://images.pexels.com/photos/7234261/pexels-photo-7234261.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.9 }
+      { id: 7, title: "House of Cards", image: "/assests/House of Cards.jpg", rating: 4.4 },
+      { id: 9, title: "Narcos", image: "/assests/Narcos.jpg", rating: 4.7 }
     ]
   },
   {
     title: "Action & Adventure",
     items: [
-      { id: 13, title: "Extraction", image: "https://images.pexels.com/photos/6899506/pexels-photo-6899506.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.2 },
-      { id: 14, title: "The Old Guard", image: "https://images.pexels.com/photos/7991618/pexels-photo-7991618.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.3 },
-      { id: 15, title: "6 Underground", image: "https://images.pexels.com/photos/8111690/pexels-photo-8111690.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.1 },
-      { id: 16, title: "Red Notice", image: "https://images.pexels.com/photos/7234255/pexels-photo-7234255.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.4 },
-      { id: 17, title: "The Gray Man", image: "https://images.pexels.com/photos/6899507/pexels-photo-6899507.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.0 },
-      { id: 18, title: "Triple Frontier", image: "https://images.pexels.com/photos/7991620/pexels-photo-7991620.jpeg?auto=compress&cs=tinysrgb&w=400", rating: 4.2 }
+      { id: 13, title: "Extraction", image: "/assests/extraction.jpg", rating: 4.2 },
+      { id: 15, title: "6 Underground", image: "/assests/Underground.jpg", rating: 4.1 },
+      { id: 17, title: "The Gray Man", image: "/assests/The Gray Man.jpg", rating: 4.0 }
     ]
   }
 ];
@@ -75,8 +67,15 @@ export default function NetflixRedesign() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-8">
-              <div className="text-2xl font-bold text-[#e50914] tracking-tight">
-                NETFLIX
+              <div style={{ width: 84, height: 84, position: 'relative' }}>
+                <Image
+                  src="/assests/N--logo.png"
+                  alt="Netflix AI Logo"
+                  fill
+                  style={{ objectFit: 'contain' }}
+                  className="rounded"
+                  priority
+                />
               </div>
               
               {/* Desktop Navigation */}
@@ -135,12 +134,14 @@ export default function NetflixRedesign() {
       {/* Hero Section */}
       <main>
       <section className="relative h-screen flex items-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url(https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1920)'
-          }}
-        >
+        <div className="absolute inset-0">
+          <Image
+            src="/assests/Stranger.jpg"
+            alt="Stranger Things Hero"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30" />
         </div>
@@ -214,15 +215,15 @@ function ContentCard({ item }: { item: any }) {
 
   return (
     <div
-      className="group relative flex-shrink-0 w-64 cursor-pointer transition-all duration-300 transform hover:scale-110 hover:z-20"
+      className="group relative flex-shrink-0 w-40 h-60 cursor-pointer transition-all duration-300 transform hover:scale-110 hover:z-20"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative overflow-hidden rounded-lg">
+      <div className="relative overflow-hidden rounded-lg w-40 h-60">
         <img
           src={item.image}
           alt={item.title}
-          className="w-full h-36 object-cover transition-all duration-300 group-hover:brightness-110"
+          className="w-40 h-60 object-cover transition-all duration-300 group-hover:brightness-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         

@@ -9,7 +9,8 @@ const inter = Inter({
 });
 
 // Determine the base URL for metadata
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://future-fs-03-eight.vercel.app/' || 'http://localhost:3000';
+
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
